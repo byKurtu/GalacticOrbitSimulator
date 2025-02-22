@@ -65,7 +65,7 @@ class CelestialBody {
     }
 
     draw() {
-        // Draw trail
+        
         ctx.beginPath();
         ctx.strokeStyle = this.color;
         ctx.lineWidth = 1;
