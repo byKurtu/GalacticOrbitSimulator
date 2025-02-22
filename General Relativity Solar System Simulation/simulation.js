@@ -1,10 +1,9 @@
-// Constants
-const G = 39.47841760435743; // Gravitational constant (AU³/M☉·yr²)
-const c = 63239.7263;   // Speed of light (AU/year)
-const dt = 0.001;       // Time step (years)
-const SCALE = 200;      // Visualization scale (pixels per AU)
+const G = 39.47841760435743; 
+const c = 63239.7263;   
+const dt = 0.001;       
+const SCALE = 200;      
 
-// Vector3D class
+
 class Vector3D {
     constructor(x, y, z) {
         this.x = x;
@@ -46,13 +45,12 @@ class Vector3D {
     }
 }
 
-// Canvas setup
 const canvas = document.getElementById('solarSystem');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth * 0.8;
 canvas.height = window.innerHeight * 0.8;
 
-// Celestial body class
+
 class CelestialBody {
     constructor(name, mass, radius, position, velocity, color, isSun = false) {
         this.name = name;
@@ -81,7 +79,6 @@ class CelestialBody {
         }
         ctx.stroke();
 
-        // Draw body
         const screenX = this.position.x * SCALE + canvas.width / 2;
         const screenY = this.position.z * SCALE + canvas.height / 2;
         ctx.beginPath();
@@ -95,7 +92,6 @@ class CelestialBody {
         );
         ctx.fill();
 
-        // Draw name
         ctx.fillStyle = 'white';
         ctx.font = '12px Arial';
         ctx.fillText(this.name, screenX + this.radius * SCALE + 5, screenY);
@@ -109,7 +105,6 @@ class CelestialBody {
     }
 }
 
-// Light ray class
 class LightRay {
     constructor(position, velocity) {
         this.position = position;
@@ -124,9 +119,7 @@ class LightRay {
     }
 }
 
-// Initialize solar system
 const bodies = [
-    // Sun
     new CelestialBody(
         "Sun",
         1.0,
@@ -136,7 +129,6 @@ const bodies = [
         "#FFD700",
         true
     ),
-    // Mercury
     new CelestialBody(
         "Mercury",
         1.651e-7,
@@ -145,7 +137,6 @@ const bodies = [
         new Vector3D(0, 10.06, 0),
         "#A0522D"
     ),
-    // Venus
     new CelestialBody(
         "Venus",
         2.447e-6,
@@ -154,7 +145,6 @@ const bodies = [
         new Vector3D(0, 7.39, 0),
         "#DEB887"
     ),
-    // Earth
     new CelestialBody(
         "Earth",
         3.003e-6,
@@ -163,7 +153,6 @@ const bodies = [
         new Vector3D(0, 6.283, 0),
         "#4169E1"
     ),
-    // Mars
     new CelestialBody(
         "Mars",
         3.213e-7,
@@ -174,9 +163,7 @@ const bodies = [
     )
 ];
 
-// Add moons and asteroids
 function addMoonsAndAsteroids() {
-    // Earth's Moon
     const earth = bodies.find(b => b.name === "Earth");
     if (earth) {
         const moonDist = 0.05;
@@ -191,7 +178,6 @@ function addMoonsAndAsteroids() {
         ));
     }
 
-    // Asteroid belt
     const sun = bodies.find(b => b.name === "Sun");
     if (sun) {
         for (let i = 0; i < 100; i++) {
@@ -215,7 +201,6 @@ function addMoonsAndAsteroids() {
     }
 }
 
-// Initialize light rays
 const lightRays = [];
 function initLightRays() {
     const numRays = 20;
@@ -231,7 +216,6 @@ function initLightRays() {
     }
 }
 
-// Calculate acceleration with GR corrections
 function calculateAcceleration(body, position) {
     let acc = new Vector3D(0, 0, 0);
     
@@ -258,7 +242,6 @@ function calculateAcceleration(body, position) {
     return acc;
 }
 
-// RK4 integration step
 function rk4Step(body, dt) {
     const p0 = body.position;
     const v0 = body.velocity;
@@ -292,7 +275,6 @@ function rk4Step(body, dt) {
     body.velocity = body.velocity.add(dv);
 }
 
-// Draw space-time grid
 function drawGrid() {
     ctx.strokeStyle = 'rgba(50, 50, 50, 0.5)';
     ctx.lineWidth = 1;
@@ -301,7 +283,6 @@ function drawGrid() {
     const simWidth = canvas.width / SCALE;
     const simHeight = canvas.height / SCALE;
     
-    // Vertical lines
     for (let x = -simWidth/2; x <= simWidth/2; x += gridSpacing) {
         ctx.beginPath();
         for (let y = -simHeight/2; y <= simHeight/2; y += 0.1) {
@@ -319,7 +300,6 @@ function drawGrid() {
         ctx.stroke();
     }
     
-    // Horizontal lines
     for (let y = -simHeight/2; y <= simHeight/2; y += gridSpacing) {
         ctx.beginPath();
         for (let x = -simWidth/2; x <= simWidth/2; x += 0.1) {
@@ -338,7 +318,6 @@ function drawGrid() {
     }
 }
 
-// Calculate space-time bending
 function bendSpaceTime(point) {
     let offset = new Vector3D(0, 0, 0);
     const k = 0.1;
@@ -355,30 +334,24 @@ function bendSpaceTime(point) {
     return point.subtract(offset);
 }
 
-// Animation state
 let isRunning = false;
 let animationFrameId = null;
 
-// Initialize simulation
 addMoonsAndAsteroids();
 initLightRays();
 
-// Animation loop
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw space-time grid
     drawGrid();
     
-    // Update and draw light rays
     for (const ray of lightRays) {
-        // Update ray position
+
         const acc = calculateAcceleration(ray, ray.position);
         ray.velocity = ray.velocity.add(acc.multiply(dt));
         ray.position = ray.position.add(ray.velocity.multiply(dt));
         ray.path.push(new Vector3D(ray.position.x, ray.position.y, ray.position.z));
         
-        // Draw ray path
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
         for (let i = 0; i < ray.path.length - 1; i++) {
@@ -389,25 +362,21 @@ function animate() {
         }
         ctx.stroke();
         
-        // Reset ray if out of bounds
         if (ray.position.x > 8) {
             ray.reset(-5, ray.position.z);
         }
         
-        // Limit path length
         if (ray.path.length > 500) {
             ray.path.shift();
         }
     }
 
-    // Update positions using RK4
     for (const body of bodies) {
         rk4Step(body, dt);
         body.updateTrail();
         body.draw();
     }
 
-    // Update simulation stats
     updateSimulationStats();
 
     if (isRunning) {
@@ -415,7 +384,6 @@ function animate() {
     }
 }
 
-// Update simulation statistics
 function updateSimulationStats() {
     const earth = bodies.find(body => body.name === "Earth");
     const stats = document.getElementById('simulationStats');
@@ -429,7 +397,6 @@ function updateSimulationStats() {
     }
 }
 
-// Event listeners
 document.getElementById('toggleSimulation').addEventListener('click', () => {
     isRunning = !isRunning;
     if (isRunning) {
@@ -440,7 +407,6 @@ document.getElementById('toggleSimulation').addEventListener('click', () => {
 });
 
 document.getElementById('resetSimulation').addEventListener('click', () => {
-    // Reset all bodies to initial positions
     bodies.length = 0;
     bodies.push(
         new CelestialBody("Sun", 1.0, 0.04, new Vector3D(0, 0, 0), new Vector3D(0, 0, 0), "#FFD700", true),
@@ -451,12 +417,10 @@ document.getElementById('resetSimulation').addEventListener('click', () => {
     );
     addMoonsAndAsteroids();
     
-    // Reset light rays
     lightRays.length = 0;
     initLightRays();
 });
 
-// Handle window resize
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth * 0.8;
     canvas.height = window.innerHeight * 0.8;
